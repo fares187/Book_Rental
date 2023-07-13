@@ -8,8 +8,8 @@ namespace Bookify.web.Core.Models
         [MaxLength(250)]
         public string Name { get; set; } = null!;
         public bool IsDeleted { get; set; } 
-        public DateTime CreatedOn { get; set; } = DateTime.Now; 
-        public DateTime? LastUpdatedOn { get;}
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow; 
+        public DateTime? LastUpdatedOn { get; set; }
         public Category() { 
         this.CreatedOn = DateTime.Now;
         }   

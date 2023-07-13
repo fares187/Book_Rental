@@ -1,0 +1,44 @@
+﻿@model CreateCategoriesViewModel
+@{
+    ViewData["Title"] = $"{(Model?.id>0 ?"Edit": "Add")} Category";
+}
+
+<div class="card">
+    <h5 class="card-header align-items-center display-5">@(Model?.id>0 ?"Edit": "Add") Categories</h5>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 card-text ">
+
+                <form method="post" asp-controller="Categories" >
+                    @if(Model?.id>0){
+
+                         <input type="hidden" asp-for="id"/>
+                    }
+                   
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control text-light" placeholder="Name" asp-for="Name">
+                        <label asp-for="Name"></label>
+                       
+                    </div>
+                    <div class="my-2 ">
+                        <span class="text-danger" asp-validation-for="Name"></span>
+
+                    </div>
+                   
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+
+                </form>
+
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"/>
+}

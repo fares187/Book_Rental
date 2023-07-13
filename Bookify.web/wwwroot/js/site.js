@@ -1,4 +1,13 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$(document).ready(function () {
+    var massage = $('#Massage').text()
+    if (massage !== '') {
+        swal.fire({
+            icon: "success",
+            title: "success",
+            text: massage,
+            customClass: {
+                confirmButton:"btn btn-primary"}
+        });
+    }
 
-// Write your JavaScript code.
+})

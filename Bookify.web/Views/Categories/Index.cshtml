@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Category>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "categories";
 }
@@ -26,27 +27,152 @@
         <div class="card-toolbar">
             <a asp-controller="Categories" asp-action="Create" type="button" class="btn btn-sm btn-success ">
                 <i class="bi bi-plus-square-fill me-3"></i>
-                
+
                 Add
             </a>
         </div>
     </div>
+
     <div class="card-body">
         @{
-            if(!Model.Any()){
+            if (!Model.Any())
+            {
                 <div class="alert alert-warning d-flex align-items-center p-5 mb-10">
                     <i class="display-4 text-warning me-3 bi bi-exclamation-octagon-fill"><span class="path1"></span><span class="path2"></span></i>                    <div class="d-flex flex-column">
-                        <h4 class="mb-1 text-warning">This is an alert</h4>
-                        <span>The alert component can be used to highlight certain parts of your page for higher content visibility.</span>
+                        <h4 class="mb-1 text-warning">Alert</h4>
+                        <span>There is no categories found.</span>
                     </div>
                 </div>
             }
             else
             {
-                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">status</th>
+                            <th scope="col">Crates On</th>
+                            <th scope="col">Last Update</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var category in Model)
+                        {
+                            <tr>
+                                <td>@category.Name</td>
+                                <td>
+                                    <span class="badge text-bg-@(category.IsDeleted? "danger": "success") text-light js-status" style="font-size: 1.5em;">
+
+                                        @(category.IsDeleted ? "Disabled" : "Active")
+                                    </span>
+
+                                </td>
+                                <td>@category.CreatedOn.ToString()</td>
+                                <td class="js-last">@category.LastUpdatedOn.ToString()</td>
+
+                                <td>
+                                    <div class="hstack gap-3">
+                                        <div class="p-2">
+                                            <a class="btn btn-sm btn-primary" style="font-size: 1.5em;" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">Edit</a>
+                                        </div>
+                                        <div class="p-2">
+                                            <a href="javascript:;" class="btn btn-sm btn-danger js-toggle-status" data-id="@category.Id" style="font-size: 1.5em;">Toggle status</a>
+                                        </div>
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
             }
 
         }
     </div>
+    @* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+    </button>*@
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<input type="hidden" name="__RequestVerificationToken" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+@section Scripts{
+    <script src="~/lib/bootbox.js/bootbox.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.js-toggle-status').on('click', function () {
+                var btn = $(this);
+                console.log(btn.data('id'))
+                bootbox.confirm({
+                    message: 'are you sure you want to toggle this category?',
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-secondary'
+                        }
+                    },
+                    callback: function (result) {
+                        if(result){
+
+                            $.post({
+                                //js-last
+                                url: '/Categories/Toggle/' + btn.data('id'),
+                                data: {
+                                    '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                                },
+                                success: function (last) {
+                                    console.log(last);
+                                    var row =btn.parents('tr')
+                                    var status = row.find('.js-status');
+                                    var newstatus = status.text().trim() === 'Disabled' ? 'Active' : 'Disabled';
+                                    status.text(newstatus).toggleClass('text-bg-success text-bg-danger');
+                                    row.find('.js-last').html(last);
+                                    row.addClass('animate__animated animate__wobble');
+                                }
+                            });
+
+                        }
+                    }
+                });
+
+
+
+
+
+
+            });
+
+
+
+
+        });
+
+    </script>
+
+}
