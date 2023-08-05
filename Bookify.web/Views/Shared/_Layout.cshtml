@@ -12,15 +12,21 @@
     <link rel="stylesheet" href="~/assats/css/style.bundle.css" type="text/css" />
     <link rel="stylesheet" href="~/lib/animate.css/animate.min.css" />
     @*<link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />*@
+    @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bookify.web.styles.css" asp-append-version="true" />
 </head>
-<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
+<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed page-loading">
 
     <script>var defaultThemeMode = "light"; var themeMode; if (document.documentElement) { if (document.documentElement.hasAttribute("data-theme-mode")) { themeMode = document.documentElement.getAttribute("data-theme-mode"); } else { if (localStorage.getItem("data-theme") !== null) { themeMode = localStorage.getItem("data-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-theme", themeMode); }</script>
     <!--end::Theme mode setup on page load-->
     <!--begin::Main-->
     <!--begin::Root-->
+    <div class="page-loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only visually-hidden">Loading...</span>
+        </div>
+    </div>
     <div class="d-flex flex-column flex-root">
         <!--begin::Page-->
         <div class="page d-flex flex-row flex-column-fluid">
@@ -61,12 +67,12 @@
     <span id="Massage" class="d-none">@TempData["Massage"]</span>
     <script>var hostUrl = "assets/";</script>
     <!--begin::Global Javascript Bundle(mandatory for all pages)-->
+  
     <script src="~/assats/js/plugins.bundle.js"></script>
 
     <script src="~/assats/js/scripts.bundle.js"></script>
     <!--end::Global Javascript Bundle-->
-
-
+    @await RenderSectionAsync("DataTable", required: false)
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

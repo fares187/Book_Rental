@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bookify.web.Core.Models
 {
+    [Index(nameof(Name),IsUnique =true)]   
     public class Category
     {
         public int Id { get; set; }
@@ -9,9 +11,7 @@ namespace Bookify.web.Core.Models
         public string Name { get; set; } = null!;
         public bool IsDeleted { get; set; } 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow; 
-        public DateTime? LastUpdatedOn { get; set; }
-        public Category() { 
-        this.CreatedOn = DateTime.Now;
-        }   
+        public DateTime? LastUpdatedOn { get; set; } 
+        public ICollection<BookCategory> Books = new List<BookCategory>();
     }
 }

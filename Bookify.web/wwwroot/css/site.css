@@ -16,7 +16,32 @@ html {
   position: relative;
   min-height: 100%;
 }
-
+/* start ovrride theme*/
+.form-floating > .form-select {
+    padding-top: 2.15rem;
+    padding-bottom: 0.0rem;
+}
+/* stop overriding theme*/
 body {
   margin-bottom: 60px;
 }
+.form-control.form-control-solid {
+    background-color: #e7ecef;
+    border-color: var(--kt-input-solid-bg);
+    color: var(--kt-input-solid-color);
+    transition: color .2s ease;
+}
+.form-select.form-select-solid {
+    background-color: #e7ecef;
+    border-color: var(--kt-input-solid-bg);
+    color: var(--kt-input-solid-color);
+    transition: color .2s ease;
+}
+/*start costum styles*/
+.dt-spinner + div{
+    display:none !important;
+}
+.h-70px{
+    height:70px !important;
+}
+/*end costum styles*/
