@@ -1,15 +1,19 @@
 ﻿using AutoMapper;
+using Bookify.web.Core.Const;
 using Bookify.web.Core.Models;
 using Bookify.web.Core.ViewModel;
 using Bookify.web.Data;
 using Bookify.web.Filter;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bookify.web.Controllers
 {
+    [Authorize(Roles = AppRoles.Archive)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,6 +54,7 @@ namespace Bookify.web.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
             Category catee = _mapper.Map<Category>(model);
+            catee.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.Add(catee);
             _context.SaveChanges();
             //CategoryViewModel view = new CategoryViewModel()
@@ -92,6 +97,7 @@ namespace Bookify.web.Controllers
             // category.Name = model.Name;
             category = _mapper.Map(model, category);
             category.LastUpdatedOn = DateTime.UtcNow;
+            category.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
             //CategoryViewModel view = new CategoryViewModel()
             //{
@@ -117,6 +123,7 @@ namespace Bookify.web.Controllers
             }
             cat.IsDeleted = !cat.IsDeleted;
             cat.LastUpdatedOn = DateTime.UtcNow;
+            cat.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
             return Ok(cat.LastUpdatedOn.ToString());
         }

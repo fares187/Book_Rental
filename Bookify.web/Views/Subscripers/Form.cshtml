@@ -1,0 +1,253 @@
+﻿@model SubscriperFormViewModel
+@inject IWebHostEnvironment _webhostEnvironment
+
+@{
+    ViewData["Title"] = "Create Subscriper";
+}
+
+<style>
+    .image-input-placeholder {
+        background-image: url( @(string.IsNullOrEmpty(Model.ImageUrl) ? "/assats/images/avatar.png" :Model.ImageUrl ));
+    }
+
+
+
+    [data-bs-theme="dark"] .image-input-placeholder {
+        background-image: url(@(string.IsNullOrEmpty(Model.ImageUrl) ? "/assats/images/avatar.png":Model.ImageUrl ));
+    }
+</style>
+<form method="post" asp-action="@(Model.Id>0 ? "Edit":"Create")" enctype="multipart/form-data">
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Id > 0)
+            {
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ImageUrl" />
+                <input type="hidden" asp-for="ThumbnailUrl" />
+            }
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h3 class="required">Image</h3>
+                </div>
+
+                <div class="col-lg-9">
+                    <div class="mb-10">
+
+                        <div class="image-input image-input-placeholder row image-input-empty mb-10 " data-kt-image-input="true">
+                            <!--begin::Image preview wrapper-->
+                            <div class="image-input-wrapper   w-150px h-150px"></div>
+                            <!--end::Image preview wrapper-->
+                            <!--begin::Edit button-->
+                            <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                                   data-kt-image-input-action="change"
+                                   data-bs-dismiss="click">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
+                                </svg>
+
+                                <!--begin::Inputs-->
+                                <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg" />
+                                <input type="hidden" />
+                                <!--end::Inputs-->
+                            </label>
+
+                            <!--end::Edit button-->
+                            <!--begin::Cancel button-->
+                            <!--end::Remove button-->
+                        </div>
+                        <div class="form-text">Allowed file formates: .png, .jpg, .jpeg , and can not exceed 2MB</div>
+                        <span asp-validation-for="Image" class="text-danger d-block"></span>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h3 class="required">FullName</h3>
+                </div>
+
+                <div class="col-lg-9 h-stack">
+                    <div class="row align-items-center d-flex">
+                        <div class="col-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" asp-for="FirstName">
+                                <label asp-for="FirstName"></label>
+                            </div>
+                            <span asp-validation-for="FirstName" class="text-danger d-block"></span>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" asp-for="LastName">
+                                <label asp-for="LastName"></label>
+                            </div>
+                            <span asp-validation-for="LastName" class="text-danger d-block"></span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h5 class="required">Date Of Birth</h5>
+                </div>
+
+                <div class="col-lg-9 ">
+                    <div class="col">
+                        <div class="form-floating mb-3">
+                            <input class="form-control form-control-solid  js-data-time-picker" asp-for="dateOfBirth">
+                            <label asp-for="dateOfBirth"></label>
+                        </div>
+                        <span asp-validation-for="dateOfBirth" class="text-danger d-block"></span>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h5 class="required">National ID</h5>
+                </div>
+
+                <div class="col-lg-9 ">
+                    <div class="row">
+                        <div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" asp-for="NationalId">
+                                <label asp-for="NationalId"></label>
+                            </div>
+                            <span asp-validation-for="NationalId" class="text-danger d-block"></span>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h5 class="required">contacts</h5>
+                </div>
+
+                <div class="col-lg-9 ">
+                    <div class="row align-items-center d-flex">
+                        <div class="col-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" asp-for="Email">
+                                <label asp-for="Email"></label>
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger d-block"></span>
+
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" asp-for="MobileNumber">
+                                <label asp-for="MobileNumber"></label>
+                            </div>
+                            <span asp-validation-for="MobileNumber" class="text-danger d-block"></span>
+
+                        </div>
+                        <div class="col-4 ">
+
+
+                            <div class="form-check  ">
+                                <input class="form-check-input" type="checkbox" asp-for="HasWhatApp">
+                                <label class="ms-2" asp-for="HasWhatApp"></label>
+                            </div>
+                            <span asp-validation-for="HasWhatApp" class="text-danger d-block"></span>
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h5 class="required">contacts</h5>
+                </div>
+
+                <div class="col-lg-9 ">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class=" mb-3">
+                                <select class="form-select form-select-solid js-governorate js-select2" data-placeholder="select the governorate" asp-for="GovernorateId" asp-items="@Model.Governorates">
+                                    <option value="" > Select an Governorate</option>
+
+                                </select>
+                                <!--<label  asp-for="SelectedCategories"></label>-->
+                            </div>
+                            <span asp-validation-for="GovernorateId" class="text-danger d-block"></span>
+
+                        </div>
+                        <div class="col-6 ">
+                            <div class=" mb-3">
+                                <select class="form-select  form-select-solid  js-select2" data-placeholder="select the Area" asp-for="AreaId" asp-items="@Model.Areas">
+                                        <option value=""> Select an Area</option>
+
+                                </select>
+                                <!--<label  asp-for="SelectedCategories"></label>-->
+                            </div>
+                            <span asp-validation-for="AreaId" class="text-danger d-block"></span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="row align-items-center d-flex">
+                <div class="col-lg-3">
+                    <h3 class="required">FullName</h3>
+                </div>
+
+                <div class="col-lg-9 h-stack">
+                    <div class="row align-items-center d-flex">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-solid" placeholder="Address" asp-for="Address">
+                                <label asp-for="Address"></label>
+                            </div>
+                            <span asp-validation-for="Address" class="text-danger d-block"></span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="row mt-2 ">
+                <div class="col-md-8">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="indicator-label">
+                            Save
+                        </span>
+                        <span class="indicator-progress">
+                            saving... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                    <a class="btn btn-secondary ms-3 text-primary" asp-action="Index">cancel</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+   
+
+</form>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/subscripers.js" asp-append-version="true"></script>
+
+}

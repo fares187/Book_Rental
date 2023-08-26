@@ -27,7 +27,13 @@ namespace Bookify.web.Core.Models
         public DateTime JoinedOn { get; set; } = DateTime.UtcNow;
         public DateTime? LastUpdatedOn { get; set; }
         
-        public ICollection<BookCategory> categories { get; set; } = new List<BookCategory>();  
+        public ICollection<BookCategory> categories { get; set; } = new List<BookCategory>();
+        public ICollection<BookCopy> copies { get; set; } =new List<BookCopy>();
+
+        public string? CreatedById { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
+        public string? LastUpdatedById { get; set; }
+        public ApplicationUser? LastUpdatedBy { get; set; }
     }
 
 }

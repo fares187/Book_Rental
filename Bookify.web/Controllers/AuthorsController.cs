@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using Bookify.web.Core.Const;
 using Bookify.web.Core.Models;
 using Bookify.web.Core.ViewModel;
 using Bookify.web.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Bookify.web.Controllers
 {
+    [Authorize(Roles =AppRoles.Archive)]
     public class AuthorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -30,7 +34,7 @@ namespace Bookify.web.Controllers
         public IActionResult Create(AuthorForm model)
         {
             Author author = _mapper.Map<Author>(model);
-           
+            author.CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.Add(author);
             _context.SaveChanges();
            
@@ -61,6 +65,7 @@ namespace Bookify.web.Controllers
             // TODO unique name maybe
             author.Name = model.Name;
             author.LastUpdatedOn = DateTime.UtcNow;
+            author.LastUpdatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.Update(author);
             _context.SaveChanges();
             return PartialView("_AuthorRow",author);
@@ -75,6 +80,7 @@ namespace Bookify.web.Controllers
             }
             author.IsDeleted=!(author.IsDeleted);
             author.LastUpdatedOn = DateTime.UtcNow;
+            author.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.Update(author);
             _context.SaveChanges();
             return Ok(author.LastUpdatedOn.ToString());

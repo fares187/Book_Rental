@@ -3,6 +3,17 @@ var table;
 var datatable;
 var expotedColumns = [];
 
+function select2() {
+    $('.js-select2').select2({
+        placeholder: $(this).data('placeholder'),
+        allowClear: true
+    });
+
+    $('.js-select2').on('select2:select', function (e) {
+        var select = $(this)
+     //   $('form').not('#SignOut').validate().element('#' + select.attr('id'))
+    });
+}
 
 function showsuccess(massage = 'saved successfully') {
     swal.fire({
@@ -16,10 +27,11 @@ function showsuccess(massage = 'saved successfully') {
 
 }
 function showfailure(massage = 'some thing went wrong') {
+
     swal.fire({
         icon: "error",
         title: "Oops...",
-        text: massage,
+        text: massage.responseText !== undefined ? massage.responseText : massage,
         customClass: {
             confirmButton: "btn btn-primary"
         }
@@ -31,30 +43,46 @@ function DisableSubmitButton() {
 }
 function OnModelBegin() {
     DisableSubmitButton();
-   // btn.toggleClass('btn-primary btn-secondary')
+    // btn.toggleClass('btn-primary btn-secondary')
 
 
 }
 function onModelSuccess(row) {
     showsuccess()
     $('#myModal').modal('hide')
-  var newrow = $(row);
-        datatable.row.add(newrow).draw();
+    var newrow = $(row);
+    datatable.row.add(newrow).draw();
 
     if (updateRow !== undefined) {
         datatable.row(updateRow).remove().draw();
         //$('tbody').append(row)
         updateRow = undefined
-    } 
+    }
     KTMenu.init();
     KTMenu.initGlobalHandlers();
 
-    
+
+}
+function OnAddCopySuccess(row) {
+    showsuccess()
+    $('#myModal').modal('hide')
+    $('tbody').prepend(row);
+    var count = $('.js-counting');
+    var newcount = parseInt(count.text()) + 1;
+    count.text(newcount);
+    $('.js-alert').addClass('d-none');
+    $('table').removeClass('d-none');
+}
+function OnEditCopySuccess(row) {
+    showsuccess()
+    $('#myModal').modal('hide')
+    updateRow.remove();
+    $('tbody').prepend(row);
 }
 
 function OnModelComplete() {
     $('body :submit').removeAttr('disabled').removeAttr('data-kt-indicator')
-   // btn.toggleClass('btn-primary btn-secondary')
+    // btn.toggleClass('btn-primary btn-secondary')
 
 
 }
@@ -67,7 +95,7 @@ $.each(headers, function (i) {
 })
 var KTDatatables = function () {
     // Shared variables
-    
+
 
     // Private functions
     var initDatatable = function () {
@@ -77,7 +105,14 @@ var KTDatatables = function () {
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
             "info": false,
-         
+            responsive: true,
+
+
+            paging: true,
+
+
+
+
             'pageLength': 10,
         });
     }
@@ -91,7 +126,7 @@ var KTDatatables = function () {
                     extend: 'copyHtml5',
                     title: documentTitle,
                     exportOptions: {
-                        columns:expotedColumns
+                        columns: expotedColumns
                     }
                 },
                 {
@@ -141,7 +176,7 @@ var KTDatatables = function () {
             datatable.search(e.target.value).draw();
         });
     }
-    
+
     // Public methods
     return {
         init: function () {
@@ -153,14 +188,35 @@ var KTDatatables = function () {
 
             initDatatable();
             exportButtons();
+            //var dropdownelement = document.querySelector('.dropdown');
+            //var dropdown = bootstrap.Dropdown.getInstance(dropdownelement);
+            //dropdown.getOrCreateInstance(dropdownelement);
+
             handleSearchDatatable();
         }
     };
 }();
 
 $(document).ready(function () {
+
+    //try to handle dropdowns
+    $('body').on('show.bs.dropdown', '.table-responsive', function () {
+        $(this).css("overflow", "visible");
+
+    }).on('hide.bs.dropdown', '.table-responsive', function () {
+        $(this).css("overflow", "auto");
+    });
+
+
+
+
+    //handle sing out button
+    $('.js-SignOut').on('click', function () {
+        $('#SignOut').submit();
+    });
+
     //disable submit button
-    $('form').on('submit', function () {
+    $('form').not('#SignOut').on('submit', function () {
         if ($('.js-tinymce').length > 0) {
             $('.js-tinymce').each(function () {
                 var input = $(this)
@@ -170,10 +226,10 @@ $(document).ready(function () {
 
         }
         var isValid = $(this).valid()
-        if(isValid) DisableSubmitButton();
+        if (isValid) DisableSubmitButton();
     });
     //handel tinymce
-    if ($('.js-tinymce').length>0) {
+    if ($('.js-tinymce').length > 0) {
         //tinymce.init({
         //    selector: ".js-tinymce", height: "480"
         //});
@@ -189,22 +245,15 @@ $(document).ready(function () {
 
     }
     //select2
-    $('.js-select2').select2({
-        placeholder: $(this).data('placeholder'),
-        allowClear: true
-    });
-
-    $('.js-select2').on('select2:select', function (e) {
-        var select = $(this)
-        $('form').validate().element('#' + select.attr('id'))
-    });
+    select2();
     //datapicker
     $('.js-data-time-picker').flatpickr({
         enableTime: true,
-        maxDate: "today"   ,
+        maxDate: "today",
         dateFormat: "Y-m-d H:i",
-    
-        monthSelectorType:"dropdown"
+        defaultDate: "today",
+
+        monthSelectorType: "dropdown"
     })
 
 
@@ -222,12 +271,12 @@ $(document).ready(function () {
 
 
     //handle drop downs in datatable
-   
+
 
     KTUtil.onDOMContentLoaded(function () {
         KTDatatables.init();
     });
-    
+
     //var massage = $('#Massage').text()
     //if (massage !== '') {
     //    swal.fire({
@@ -238,6 +287,49 @@ $(document).ready(function () {
     //            confirmButton:"btn btn-primary"}
     //    });
     //}
+
+
+    // handel add modal
+    $('body').delegate('.js-confirm', "click", function () {
+        var btn = $(this);
+        console.log(btn.data('url'))
+        bootbox.confirm({
+            message: btn.data('massage'),
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-danger'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-secondary'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+
+                    $.post({
+                        //js-last
+                        url: btn.data('url'),
+                        data: {
+                            '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function () {
+                            showsuccess();
+                        
+                        
+                         
+                        },
+                        error: function () {
+                            showfailure()
+                        }
+                    });
+
+                }
+            }
+        });
+    });
+
 
     // handel add modal
     $('body').delegate('.js-render-modal', 'click', function () {
@@ -253,8 +345,12 @@ $(document).ready(function () {
             url: btn.data('url'),
             success: function (form) {
 
+
+
                 modal.find('.modal-body').html(form);
                 $.validator.unobtrusive.parse(modal);
+
+                select2();
             },
             error: function () {
                 showfailure()
@@ -290,14 +386,15 @@ $(document).ready(function () {
                         },
                         success: function (last) {
                             console.log(btn.data('url'))
-                        //    console.log(last);
+                            //    console.log(last);
                             var row = btn.parents('tr')
                             var status = row.find('.js-status');
+
                             var newstatus = status.text().trim() === 'Disabled' ? 'Active' : 'Disabled';
                             status.text(newstatus).toggleClass('bg-light-success bg-light-danger');
                             status.text(newstatus).toggleClass('text-success text-danger');
                             row.find('.js-last').html(last);
-                           // row.addClass('animate__animated animate__wobble');
+                            // row.addClass('animate__animated animate__wobble');
                         }
                     });
 

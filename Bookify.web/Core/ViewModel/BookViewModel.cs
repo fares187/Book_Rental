@@ -27,5 +27,7 @@ namespace Bookify.web.Core.ViewModel
         public DateTime? LastUpdatedOn { get; set; }
 
         public IEnumerable<string> categories { get; set; } = null!;
+        public IEnumerable<BookCopyViewModel> BookCopies { get; set; } = null!;
+
     }
 }

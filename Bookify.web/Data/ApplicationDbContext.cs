@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Bookify.web.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -21,12 +21,28 @@ namespace Bookify.web.Data
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
         public DbSet<Author> Authors { get; set; }
+        public DbSet<Area> Areas { get; set; }
         public DbSet<Book> Books { get; set; }  
+        public DbSet<BookCopy> BookCopies { get; set; }  
         public DbSet<BookCategory> BooksCategories { get; set; } 
         public DbSet<Category> Categories { get; set; }   
+        public DbSet<Governorate> Governorates { get; set; }   
+        public DbSet<Subscriper> Subscripers { get; set; }   
+
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.HasSequence<int>("SerialNumber",schema:"shared")
+                .StartsAt(1000001);
+            builder.Entity<BookCopy>()
+                .Property(e => e.SerialNumber)
+                .HasDefaultValueSql("nextval('\"shared\".\"SerialNumber\"') ") ;
+
+            var cascadefor = builder.Model.GetEntityTypes()
+                .SelectMany(t=>t.GetForeignKeys())
+                .Where(t=>t.DeleteBehavior== DeleteBehavior.Cascade && !t.IsOwnership);
+            foreach(var fk in cascadefor)
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
             builder.Entity<BookCategory>().HasKey(e => new
             {
                 e.BookId,

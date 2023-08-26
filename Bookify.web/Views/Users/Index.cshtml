@@ -1,0 +1,136 @@
+﻿@model IEnumerable<UserViewModel>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Users managment tab";
+}
+@section Styles {
+    <link href="~/assats/plugins/datatables/datatables.bundle.css" rel="stylesheet" />
+
+}
+<div class="alert justify-content-between alert-info d-flex align-items-center p-5 mb-10">
+
+    <div class="hstack align-content-center ">
+        <span class="svg-icon  svg-icon-3x text-info svg-icon-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+            </svg>
+
+        </span>
+        <div class="d-flex flex-column">
+            <h4 class="mb-1 text-info">Users</h4>
+
+        </div>
+    </div>
+    <div class="card-toolbar justify-content-end">
+        <a type="button" herf="javascript:;" class="btn btn-sm btn-success js-render-modal"
+           data-title="Add User" data-url="/Users/Create">
+            <i class="bi bi-plus-square-fill me-3"></i>
+
+            Add
+        </a>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <span class="svg-icon fs-1 position-absolute ms-4">
+                    <i class="bi bi-search fs-1"></i>
+                </span>
+                <input type="text" data-kt-filter="search" class="form-control form-control-solid form-control form-control-solid-solid w-250px ps-14" placeholder="Search" />
+            </div>
+            <!--end::Search-->
+            <!--begin::Export buttons-->
+            <div id="kt_datatable_example_1_export" class="d-none"></div>
+            <!--end::Export buttons-->
+        </div>
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <!--begin::Export dropdown-->
+            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                <i class="bi fs-1 bi-box-arrow-down"></i>
+                Export
+            </button>
+            <!--begin::Menu-->
+            <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                <!--begin::Menu item-->
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                        Copy to clipboard
+                    </a>
+                </div>
+                <!--end::Menu item-->
+                <!--begin::Menu item-->
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="excel">
+                        Export as Excel
+                    </a>
+                </div>
+                <!--end::Menu item-->
+                <!--begin::Menu item-->
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                        Export as CSV
+                    </a>
+                </div>
+                <!--end::Menu item-->
+                <!--begin::Menu item-->
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                        Export as PDF
+                    </a>
+                </div>
+                <!--end::Menu item-->
+            </div>
+            <!--end::Menu-->
+            <!--end::Export dropdown-->
+            <!--begin::Hide default export buttons-->
+            <div id="kt_datatable_example_buttons" class="d-none"></div>
+            <!--end::Hide default export buttons-->
+        </div>
+    </div>
+
+    <div class="card-body">
+
+
+        <table class="table js-DataTables" data-document-title="Categories">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Created On</th>
+                    <th>Last Updated On</th>
+                    <th>status</th>
+                    <th class="text-end js-no-export">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var user in Model)
+                {
+                    <partial name="_UserRow" model="@user" />
+                }
+
+
+            </tbody>
+        </table>
+
+
+
+    </div>
+    <partial name="Modal" />
+
+</div>
+<input type="hidden" name="__RequestVerificationToken" value="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
+@section DataTable{
+    <script src="~/assats/plugins/datatables/datatables.bundle.js"></script>
+}
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+  
+    <script src="~/lib/bootbox.js/bootbox.min.js"></script>
+
+
+}

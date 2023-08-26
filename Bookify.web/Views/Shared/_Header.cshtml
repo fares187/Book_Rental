@@ -1,4 +1,15 @@
-﻿<!--begin::Header-->
+﻿@using System.Security.Claims
+@inject IWebHostEnvironment WebHostEnvironment
+
+@{
+   
+    
+    string avatarUrl = System.IO.File.Exists($"{WebHostEnvironment.WebRootPath}/Images/Users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png")
+        ? $"/Images/Users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png"
+        : "/assats/images/avatar.png";
+}
+
+<!--begin::Header-->
 <div id="kt_header" class="header">
     <!--begin::Container-->
     <div class="container-fluid d-flex flex-stack">
@@ -129,13 +140,13 @@
                     <!--begin::Name-->
                     <div class="d-none d-md-flex flex-column align-items-end justify-content-center me-2 me-md-4">
                         <span class="text-muted fs-8 fw-semibold lh-1 mb-1">Max</span>
-                        <span class="text-white fs-8 fw-bold lh-1">UX Designer</span>
+                        <span class="text-white fs-8 fw-bold lh-1">@User.FindFirst(ClaimTypes.GivenName)!.Value</span>
                     </div>
                     <!--end::Name-->
                     <!--begin::Symbol-->
                     <div class="symbol symbol-30px symbol-md-40px">
                         @*<img src="~/assets/images/avatar.png" alt="image" />*@
-                        <img src="~/assats/images/avatar.png" alt="image" />
+                        <img src="@avatarUrl" alt="image" />
                     </div>
                     <!--end::Symbol-->
                 </div>
@@ -147,16 +158,16 @@
                         <div class="menu-content d-flex align-items-center px-3">
                             <!--begin::Avatar-->
                             <div class="symbol symbol-50px me-5">
-                                <img src="~/assats/images/avatar.png" />
+                                <img src="@avatarUrl" />
                             </div>
                             <!--end::Avatar-->
                             <!--begin::Username-->
                             <div class="d-flex flex-column">
                                 <div class="fw-bold d-flex align-items-center fs-5">
-                                    Max Smith
-                                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span>
+                                    @User.FindFirst(ClaimTypes.GivenName)!.Value
+                                    
                                 </div>
-                                <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">max@kt.com</a>
+                                <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">@User.FindFirst(ClaimTypes.Email)!.Value</a>
                             </div>
                             <!--end::Username-->
                         </div>
@@ -164,23 +175,18 @@
                     <!--end::Menu item-->
                     <!--begin::Menu separator-->
                     <div class="separator my-2"></div>
-                    <!--end::Menu separator-->
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-5">
-                        <a href="../../demo14/dist/account/overview.html" class="menu-link px-5">My Profile</a>
-                    </div>
-                    <!--end::Menu item-->
-                    <!--begin::Menu separator-->
-                    <div class="separator my-2"></div>
+                   
                     <!--end::Menu separator-->
                     <!--begin::Menu item-->
                     <div class="menu-item px-5 my-1">
-                        <a href="../../demo14/dist/account/settings.html" class="menu-link px-5">Account Settings</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="menu-link px-5">Account Settings</a>
                     </div>
                     <!--end::Menu item-->
                     <!--begin::Menu item-->
                     <div class="menu-item px-5">
-                        <a href="../../demo14/dist/authentication/layouts/corporate/sign-in.html" class="menu-link px-5">Sign Out</a>
+                        <form  id="SignOut" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/">
+                            <a  type="submit" class="menu-link px-5 js-SignOut">Sign Out</a>
+                        </form>
                     </div>
                     <!--end::Menu item-->
                 </div>

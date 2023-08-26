@@ -9,7 +9,8 @@ namespace Bookify.web.Core.ViewModel
     {
         public int id { get; set; } 
         [MaxLength(250, ErrorMessage = Error.max), Display(Name = "Category")]
-        [Remote("UniqeItem", "Categories",AdditionalFields ="id" ,ErrorMessage =Error.Dublicated)]
+        [Remote("UniqeItem", "Categories",AdditionalFields ="id" ,ErrorMessage =Error.Dublicated),
+            RegularExpression(RegaxStatic.CharactersOnly_Eng, ErrorMessage = Error.OnlyEnglishLetter)]
         public string Name { get; set; } = null!;
     }
 }

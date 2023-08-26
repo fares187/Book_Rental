@@ -7,6 +7,7 @@ using Bookify.web.Filter;
 using Bookify.web.settings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Linq.Dynamic.Core;
+using System.Security.Claims;
 using System.Text.Json.Serialization.Metadata;
 
 namespace Bookify.web.Controllers
 {
 
-
+    [Authorize(Roles = AppRoles.Archive)]
     public class BooksController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -81,6 +83,7 @@ namespace Bookify.web.Controllers
         {
             Book? book = _context.Books
                 .Include(b=> b.Author)
+                .Include(b=>b.copies)
                 .Include(b=>b.categories)
                 .ThenInclude(b=>b.Category)
                 .SingleOrDefault(b =>b.Id == id);
@@ -100,6 +103,8 @@ namespace Bookify.web.Controllers
             if (book is null) return NotFound();
             book.IsDeleted = !book.IsDeleted;
             book.LastUpdatedOn = DateTime.UtcNow;
+            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
             return Ok();
         }
@@ -158,7 +163,7 @@ namespace Bookify.web.Controllers
                 book.ImageThumbnailUrl = GetThumbnailurl(book.ImageUrl);
                 book.ImagePublicId = result.PublicId;
             }
-
+            book.CreatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             _context.Books.Add(book);
 
@@ -188,7 +193,10 @@ namespace Bookify.web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult>  Edit(BookFormViewModel model)
         {
-            Book? book = _context.Books.Include(t => t.categories).FirstOrDefault(p => p.Id == model.Id);
+            Book? book = _context.Books
+                .Include(t => t.categories)
+                .Include(t=>t.copies)
+                .FirstOrDefault(p => p.Id == model.Id);
             if (book is null) return NotFound();
 
             if (!ModelState.IsValid)
@@ -255,7 +263,12 @@ namespace Bookify.web.Controllers
                 Debug.WriteLine(category);
             }
             book.LastUpdatedOn=DateTime.Now;
-
+            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            if (!model.IsAvailableForRental)
+            {
+                foreach (var copy in book.copies)
+                    copy.IsAvailableForRental = false;
+            }
             _context.SaveChanges();
             //int id = _context.Books.FirstOrDefault(d => d.AuthorId == model.AuthorId && d.Title == model.Title).Id;
             //foreach (var category in model.SelectedCategories)
@@ -285,7 +298,7 @@ namespace Bookify.web.Controllers
         }
         private string GetThumbnailurl (string url)
         {
-            //  https://res.cloudinary.com/macto/image/upload/c_thumb,w_200,g_face/v1690690181/20a22052-4811-4817-b872-db2519586a1cattachment_78895234-3458531430_eja7b9.jpg
+            
 
             string saperator = "/image/upload/";
             var spliturl= url.Split(saperator);
