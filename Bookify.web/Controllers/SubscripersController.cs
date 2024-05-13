@@ -8,11 +8,17 @@ using Bookify.web.Filter;
 using Bookify.web.Migrations;
 using Bookify.web.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Bookify.web.Controllers
 {
@@ -20,18 +26,26 @@ namespace Bookify.web.Controllers
     public class SubscripersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDataProtector _dataProtector; 
         private readonly IMapper _mapper;
+        private readonly IEmailBodyBuilder _emailBodyBuilder;
+        private readonly IEmailSender _emailSender;
         private readonly IImageService _imageService;
+        private readonly IBackgroundTaskQueue _queue;
         private readonly List<string> _allowedExtentions = new()
         {
             ".jpg",".jpeg",".png"
         };
         private readonly int _maxAllowedSize = 2097152;
-        public SubscripersController(ApplicationDbContext context, IMapper mapper, IImageService imageService)
+        public SubscripersController(ApplicationDbContext context, IMapper mapper, IImageService imageService, IDataProtectionProvider dataProtectionProvider, IEmailSender emailSender = null, IEmailBodyBuilder emailBodyBuilder = null, IBackgroundTaskQueue queue = null)
         {
             _context = context;
             _mapper = mapper;
             _imageService = imageService;
+            _dataProtector = dataProtectionProvider.CreateProtector("MySecureKey");
+            _emailSender = emailSender;
+            _emailBodyBuilder = emailBodyBuilder;
+            _queue = queue;
         }
 
         public IActionResult Index()
@@ -92,19 +106,30 @@ namespace Bookify.web.Controllers
                 NationalId = model.NationalId,
 
             };
+
+            Subscription subscription = new()
+            {
+                CreatedById=sub.CreatedById,
+                CreatedOn=sub.CreatedOn,
+                StartDate=DateTime.Today,
+                EndDate=DateTime.Today.AddYears(1)
+            };
+            sub.Subscriptions.Add(subscription);    
             _context.Add(sub);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            var subId = _dataProtector.Protect(sub.Id.ToString());
+            return RedirectToAction("Details", new {Id= subId });
 
         }
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(string id)
         {
-            var user = _context.Subscripers.FirstOrDefault(b => b.Id == id);
+            var subscriberId = int.Parse(_dataProtector.Unprotect(id));
+            var user = _context.Subscripers.FirstOrDefault(b => b.Id == subscriberId);
             if (user is null)
                 return NotFound();
             var ViewModel = _mapper.Map<SubscriperFormViewModel>(user);
-
+            ViewModel.key = id;
             return View("Form", ReturnViewModels(ViewModel));
 
         }
@@ -113,7 +138,8 @@ namespace Bookify.web.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            Subscriper? subscriper = await _context.Subscripers.FirstOrDefaultAsync(b => b.Id == model.Id);
+            var subscriberId = int.Parse(_dataProtector.Unprotect(model.key));
+            Subscriper? subscriper = await _context.Subscripers.FirstOrDefaultAsync(b => b.Id == subscriberId);
             if (subscriper is null)
                 return NotFound();
             _mapper.Map(model, subscriper);
@@ -138,7 +164,7 @@ namespace Bookify.web.Controllers
             _context.Update(subscriper);
             _context.SaveChanges();
 
-            return RedirectToAction("index");
+            return RedirectToAction("Details", new {Id=model.key});
         }
 
         //[AjaxOnly]
@@ -155,14 +181,21 @@ namespace Bookify.web.Controllers
             return Ok(areas);
         }
         [HttpGet]
-        public IActionResult Details(int id)
+        public IActionResult Details(string id)
         {
+            var subscriberId = int.Parse(_dataProtector.Unprotect(id)) ;
+
             var sub = _context.Subscripers.Include(b=>b.Governorate)
                 .Include(b=>b.Area)
-                .SingleOrDefault(s=>s.Id== id);
+                .Include(b=>b.Governorate)
+                .Include(b=>b.Subscriptions)
+                .Include(b=>b.Rentals)
+                .ThenInclude(b=>b.RentalCopies)
+                .SingleOrDefault(s=>s.Id== subscriberId);
             if (sub is null)
                 return NotFound();
             var viewModel = _mapper.Map<SubscriperDetailsViewModel>(sub);
+            viewModel.Key = id;
             return View("Details",viewModel);
 
         }
@@ -177,14 +210,20 @@ namespace Bookify.web.Controllers
                 b=>b.Email==model.Value || 
                             b.NationalId== model.Value|| 
                             b.MobileNumber== model.Value);
-            var viewModel = _mapper.Map<SubscriperFormViewModel>(subscriper);
-            return PartialView("_Result",subscriper);
+
+            var viewModel = _mapper.Map<SubscriberSearchViewModel>(subscriper);
+            if(subscriper is not null)
+            viewModel.Key = _dataProtector.Protect(subscriper.Id.ToString());
+            return PartialView("_Result",viewModel);
         }
         public IActionResult UniqeNationalId(SubscriperFormViewModel model)
         {
-            if (model.Id > 0)
+            var ModelId = 0;
+            if(!string.IsNullOrEmpty(model.key) )
+                ModelId = int.Parse(_dataProtector.Unprotect(model.key));
+            if (ModelId > 0)
             {
-                bool iswith = _context.Subscripers.Where(c => c.Id != model.Id).Any(c => c.NationalId == model.NationalId);
+                bool iswith = _context.Subscripers.Where(c => c.Id != ModelId).Any(c => c.NationalId == model.NationalId);
                 return Json(!iswith);
             }
             bool IsAcategory = _context.Subscripers.Any(c => c.NationalId == model.NationalId);
@@ -192,9 +231,12 @@ namespace Bookify.web.Controllers
         }
         public IActionResult UniqeEmail(SubscriperFormViewModel model)
         {
-            if (model.Id > 0)
+            var ModelId = 0;
+            if (!string.IsNullOrEmpty(model.key))
+                ModelId = int.Parse(_dataProtector.Unprotect(model.key));
+            if (ModelId > 0)
             {
-                bool iswith = _context.Subscripers.Where(c => c.Id != model.Id).Any(c => c.Email == model.Email);
+                bool iswith = _context.Subscripers.Where(c => c.Id != ModelId).Any(c => c.Email == model.Email);
                 return Json(!iswith);
             }
             bool IsAcategory = _context.Subscripers.Any(c => c.Email == model.Email);
@@ -202,9 +244,12 @@ namespace Bookify.web.Controllers
         }
         public IActionResult UniqeMobileNumber(SubscriperFormViewModel model)
         {
-            if (model.Id > 0)
+            var ModelId = 0;
+            if (!string.IsNullOrEmpty(model.key))
+                ModelId = int.Parse(_dataProtector.Unprotect(model.key));
+            if (ModelId > 0)
             {
-                bool iswith = _context.Subscripers.Where(c => c.Id != model.Id).Any(c => c.MobileNumber == model.MobileNumber);
+                bool iswith = _context.Subscripers.Where(c => c.Id != ModelId).Any(c => c.MobileNumber == model.MobileNumber);
                 return Json(!iswith);
             }
             bool IsAcategory = _context.Subscripers.Any(c => c.MobileNumber == model.MobileNumber);
@@ -227,6 +272,46 @@ namespace Bookify.web.Controllers
 
             return ViewModel;
 
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RenewSubscription(string key)
+        {
+            
+            var subscriperId = int.Parse(_dataProtector.Unprotect(key));
+            var subscriber = _context.Subscripers.Include(b => b.Subscriptions).SingleOrDefault(b => b.Id == subscriperId);
+            if (subscriber is null)
+                return NotFound();
+            if (subscriber.IsBlackListed)
+                return BadRequest();
+            var lastsubscription = subscriber.Subscriptions.Last();
+            var startDate= (lastsubscription.EndDate< DateTime.Today) ? DateTime.Today : lastsubscription.EndDate.AddDays(1);  
+            Subscription subscription = new()
+            {
+                CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value,
+                CreatedOn= DateTime.UtcNow,  
+                StartDate=startDate,
+                EndDate=startDate.AddYears(1)
+            };
+            
+            subscriber.Subscriptions.Add(subscription);
+
+           
+            // ToDo: send email
+            string body = _emailBodyBuilder.EmailBodyConfirm
+               ("https://res.cloudinary.com/macto/image/upload/v1693393451/Ok-rafiki_fw7rpd.png"
+               , $"Hey {subscriber.FirstName} {subscriber.LastName}, thanks for joining us"
+               , "your Subscription has been extended successfully");
+            _queue.QueueBackgroundWorkItem(async token =>
+            {
+await _emailSender.SendEmailAsync(subscriber.Email, "Confirm your email", body);
+            });
+                
+          
+            
+            _context.SaveChanges();
+            var viewModel = _mapper.Map<SubscriptionViewModel>(subscription);
+            return PartialView("renewalRow", viewModel);
         }
     }
 

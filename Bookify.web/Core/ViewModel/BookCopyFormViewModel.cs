@@ -7,6 +7,7 @@ namespace Bookify.web.Core.ViewModel
     public class BookCopyFormViewModel
     {
         public int Id { get; set; }
+        
         public int BookId { get; set; }
         [Display(Name = "Is Available For Rental")]
         [Required]

@@ -1,0 +1,126 @@
+﻿@model RentalReturnFormViewModel
+@{
+    ViewData["Title"] = "Return Rental";
+}
+@if (Model.rentalCopies.All(c => c.ReturnDate.HasValue))
+{
+    <div class="alert alert-warning d-flex align-items-center p-5 mb-10" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cone-striped" viewBox="0 0 16 16">
+            <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098zm4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"></path>
+        </svg>
+        <div class="d-flex flex-column">
+            <h4 class="mb-1 text-warning">All Rentals have returned </h4>
+
+        </div>
+
+    </div>
+}
+else
+{
+
+
+    <form asp-controller="Rentals">
+        <div class="d-flex flex-wrap">
+            @for (int i = 0; i < Model.rentalCopies.Count(); i++)
+            {
+
+                var Copy = Model.rentalCopies[i];
+
+                <div class="card me-5  mb-5" style="width: 18rem;
+              border-color: white;
+             border-style: solid;
+             border-width: 1px;
+             border-radius: 8px;
+             ">
+                    <div style="height:220px;overflow: hidden;align-items: center; justify-content: center;" class=" card-img-top d-flex">
+                        <img src="@Copy.CopyBook.ThumbnailUrl" style="width:100%; height:auto;" class="" alt="@Copy.CopyBook.BookTitle" />
+
+                    </div>
+
+
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">@Copy.CopyBook.BookTitle</h3>
+                        <hr>
+                        <div class="d-flex" style="justify-content: space-between;">
+                            Rental Date: <span>@Copy.RentalDate.ToString("dd MMM, yyyy")</span>
+                        </div>
+
+
+                        <div class="d-flex" style="justify-content: space-between;">
+                            Return Date: <span>@Copy.ReturnDate?.ToString("dd MMM, yyyy")</span>
+                        </div>
+
+
+
+                        <div class="d-flex" style="justify-content: space-between;">
+                            End Date: <span>@Copy.EndDate.ToString("dd MMM, yyyy")</span>
+                        </div>
+
+
+
+                        <div class="d-flex" style="justify-content: space-between;">
+                            Extend Date: <span>@Copy.ExtendedOn?.ToString("dd MMM, yyyy")</span>
+                        </div>
+
+                        <br>
+                        <div class="d-flex" style="justify-content: space-between;">
+                            <div class="form-check form-check-custom form-check-success form-check-solid">
+                                <input class="form-check-input" type="radio" value="true" asp-for="@Model.SelectedCopies[i].IsReturned" id="@($"{Model.SelectedCopies[i].Id}_true")" />
+                                <input type="hidden" asp-for="@Model.SelectedCopies[i].Id" id="@($"{Model.SelectedCopies[i].Id}_true_id" )" />
+                                <label class="form-check-label" for="flexCheckboxLg">
+                                    Return
+                                </label>
+                            </div>
+
+
+
+                            <div class="form-check form-check-custom form-check-primary form-check-solid">
+                                <input class="form-check-input" type="radio" value="false" asp-for="@Model.SelectedCopies[i].IsReturned"
+                                       id="@($"{Model.SelectedCopies[i].Id}_false")"
+                                       disabled="@(Model.AllowExtend? null: "disabled")" />
+                                <input type="hidden" asp-for="@Model.SelectedCopies[i].Id" id="@($"{Model.SelectedCopies[i].Id}_false_id" )" />
+
+                                <label class="form-check-label" for="flexRadioLg">
+                                    Extend
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
+
+                </div>
+
+            }
+          
+
+            
+        </div>
+
+       
+        @if (Model.TotalDelayInDays > 0)
+        {
+            <div class="form-check form-check-custom form-check-solid my-5 me-10">
+                <input type="hidden" asp-for="TotalDelayInDays"/>
+                <input class="form-check-input " type="checkbox" asp-for="PenaltyPaid" />
+                <label class="form-check-label" asp-for="PenaltyPaid"></label>
+            </div>
+        } 
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <button type="submit" id="save_btn" class="btn btn-primary">
+            <span class="indicator-label">
+                Save
+            </span>
+            <span class="indicator-progress">
+                saving... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+            </span>
+        </button>
+
+    </form>
+}
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

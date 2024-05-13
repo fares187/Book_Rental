@@ -1,4 +1,4 @@
-﻿@model SubscriperViewModel
+﻿@model SubscriberSearchViewModel
 <div class="card" >
     
     <div class="card-body">
@@ -20,16 +20,16 @@
         {
             <div class="d-flex justify-content-between">
                 <div class="d-flex flex-column justify-content-center">
-                    <h4>@Model.fullName</h4>
+                    <h4>@Model.FullName</h4>
                     <div>
 
-                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@Model.Id">Details</a>
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@Model.Key">Details</a>
                     </div>
                    
                 </div>
                 <div>
                     <div class="symbol symbol-100px">
-                        <img src="@Model.ImageThumbnailUrl" alt="Image"/>
+                        <img src="@Model.thumbnailImageURL" alt="Image"/>
                     </div>
 
                 </div>

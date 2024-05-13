@@ -55,5 +55,8 @@ namespace Bookify.web.Core.Models
 		public ApplicationUser? LastUpdatedBy { get; set; }
 
 		public DateTime? LastUpdatedOn { get; set; }
+
+		public ICollection<Subscription> Subscriptions { get; set; }	=new List<Subscription>();
+		public ICollection<Rental> Rentals { get; set; }	=new List<Rental>();
 	}
 }

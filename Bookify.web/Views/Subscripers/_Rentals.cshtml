@@ -1,0 +1,64 @@
+﻿@model IEnumerable<RentalViewModel>
+
+<div class="alert alert-warning d-flex align-items-center p-5 mb-10" style="display:@(Model.Any()? "none !important":string.Empty)" id="Alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cone-striped" viewBox="0 0 16 16">
+        <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098zm4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"></path>
+    </svg>
+    <div class="d-flex flex-column">
+        <h4 class="mb-1 text-warning">This subscriber has no Rentals yet</h4>
+
+    </div>
+
+</div>
+
+<!--begin::Table-->
+
+<div class="table-responsive" style="display:@(!Model.Any()?"none !important":string.Empty)" id="RentalsTable">
+    <table class="table align-middle table-row-dashed gy-5 dataTable no-footer " id="SubscriptionsTable">
+        <thead class="border-bottom border-gray-200 fs-7 fw-bold">
+            <tr class="text-start text-muted text-uppercase gs-0">
+                <th class="min-w-100px">Start Date</th>
+                <th class="min-w-100px">Number Of Copies</th>
+                <th class="min-w-100px">Total Delay (Days)</th>
+                <th class="min-w-100px">Added on</th>
+                <th class="min-w-100px text-end pe-5">status</th>
+
+            </tr>
+        </thead>
+        <tbody class="fs-6 fw-semibold text-gray-600">
+            @foreach (var Rental in Model)
+            {
+
+                <tr class="odd">
+                    <td>
+                        @Rental.StartDate.ToString("dd ,MMM yyyy")
+                    </td>
+                    <td class="js-numberOfCopies">
+                        @Rental.numberOfCopies
+                    </td>
+                    <td>
+                        @Rental.TotalDelayInDays
+                    </td>
+                    <td>
+                        @Rental.CreatedOn.ToString("dd ,MMM yyyy")
+                    </td>
+                    <td data-order="Invalid date" class="text-end pe-3">
+                        @if (Rental.CreatedOn.Date == DateTime.Today)
+                        {
+                            <a href="javascript:;" class="btn btn-danger btn-sm js-cancel-rental" data-id="@Rental.Id">Cancel</a>
+
+                        }
+                        <a class="btn btn-primary btn-sm" asp-controller="Rentals" asp-action="Details" asp-route-id="@Rental.Id">Details</a>
+                    </td>
+
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+    <div class="row"><div class="col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start"></div><div class="col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end"><div class="dataTables_paginate paging_simple_numbers" id="kt_table_customers_payment_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="kt_table_customers_payment_previous"><a href="#" aria-controls="kt_table_customers_payment" data-dt-idx="0" tabindex="0" class="page-link"><i class="previous"></i></a></li><li class="paginate_button page-item active"><a href="#" aria-controls="kt_table_customers_payment" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="kt_table_customers_payment" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item next" id="kt_table_customers_payment_next"><a href="#" aria-controls="kt_table_customers_payment" data-dt-idx="3" tabindex="0" class="page-link"><i class="next"></i></a></li></ul></div></div></div>
+
+</div>
+
+<!--end::Table-->

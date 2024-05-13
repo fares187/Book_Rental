@@ -38,11 +38,11 @@ function showfailure(massage = 'some thing went wrong') {
     });
 
 }
-function DisableSubmitButton() {
-    $('body :submit').attr('disabled', 'disabled').attr('data-kt-indicator', 'on')
+function DisableSubmitButton(btn) {
+    $(btn).attr('disabled', 'disabled').attr('data-kt-indicator', 'on')
 }
 function OnModelBegin() {
-    DisableSubmitButton();
+    DisableSubmitButton($('#Modal').find(':submit'));
     // btn.toggleClass('btn-primary btn-secondary')
 
 
@@ -216,7 +216,7 @@ $(document).ready(function () {
     });
 
     //disable submit button
-    $('form').not('#SignOut').on('submit', function () {
+    $('form').not('.js-excluded-validataion').not('#SignOut').on('submit', function () {
         if ($('.js-tinymce').length > 0) {
             $('.js-tinymce').each(function () {
                 var input = $(this)
@@ -226,7 +226,7 @@ $(document).ready(function () {
 
         }
         var isValid = $(this).valid()
-        if (isValid) DisableSubmitButton();
+        if (isValid) DisableSubmitButton($(this).find(':submit'));
     });
     //handel tinymce
     if ($('.js-tinymce').length > 0) {

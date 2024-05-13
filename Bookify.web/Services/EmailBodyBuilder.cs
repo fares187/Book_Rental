@@ -27,5 +27,17 @@ namespace Bookify.web.Services
 				  .Replace("[linkTitle]", linkTitle) ;
 			return body;
 		}
-	}
+        public string EmailBodyConfirm(string imageurl, string header, string bodys)
+        {
+            var filePath = $"{_webHostEnvironment.WebRootPath}/assats/templates/confirememail.html";
+            StreamReader reader = new StreamReader(filePath);
+            var body = reader.ReadToEnd();
+            reader.Close();
+            body = body
+                  .Replace("[imageUrl]", imageurl)
+                  .Replace("[header]", header)
+                  .Replace("[body]", bodys);
+            return body;
+        }
+    }
 }

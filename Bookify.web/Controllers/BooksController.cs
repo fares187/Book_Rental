@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using System.Diagnostics;
 using System.Linq.Dynamic.Core;
 using System.Security.Claims;
@@ -36,13 +37,13 @@ namespace Bookify.web.Controllers
         private readonly int _maxAllowedSize = 2097152;
         public BooksController(ApplicationDbContext context,
             IMapper mapper,
-            IWebHostEnvironment webHostEnvironment,IOptions<CloudinarySettings>  cloudinary)
+            IWebHostEnvironment webHostEnvironment, IOptions<CloudinarySettings> cloudinary)
         {
             Account account = new()
             {
-                Cloud=cloudinary.Value.CloudName,
-                ApiKey=cloudinary.Value.APIKey,
-                ApiSecret=cloudinary.Value.APISecret
+                Cloud = cloudinary.Value.CloudName,
+                ApiKey = cloudinary.Value.APIKey,
+                ApiSecret = cloudinary.Value.APISecret
             };
             _cloudinarySettings = new Cloudinary(account);
             _mapper = mapper;
@@ -64,47 +65,47 @@ namespace Bookify.web.Controllers
             string? order = Request.Form["order[0][dir]"];
             string? searchvalue = Request.Form["search[value]"];
             IQueryable<Book> books = _context.Books
-                .Include(b=>b.Author)
-                .Include(b=>b.categories)
-                .ThenInclude(b=>b.Category);
+                .Include(b => b.Author)
+                .Include(b => b.categories)
+                .ThenInclude(b => b.Category);
             if (!string.IsNullOrEmpty(searchvalue))
             {
                 books = books.Where(b => b.Title.Contains(searchvalue) || b.Author.Name.Contains(searchvalue));
             }
             books = books.OrderBy($"{sortcolumnname} {order}");
-            var data=books.Skip(start).Take(length).ToList();
+            var data = books.Skip(start).Take(length).ToList();
             var _mappedData = _mapper.Map<IEnumerable<BookViewModel>>(data);
 
             int recordsTotal = _context.Books.Count();
-            var jsonData = new {recordsFiltered=recordsTotal,recordsTotal,data=_mappedData };
+            var jsonData = new { recordsFiltered = recordsTotal, recordsTotal, data = _mappedData };
             return Ok(jsonData);
         }
         public IActionResult Details(int id)
         {
             Book? book = _context.Books
-                .Include(b=> b.Author)
-                .Include(b=>b.copies)
-                .Include(b=>b.categories)
-                .ThenInclude(b=>b.Category)
-                .SingleOrDefault(b =>b.Id == id);
+                .Include(b => b.Author)
+                .Include(b => b.copies)
+                .Include(b => b.categories)
+                .ThenInclude(b => b.Category)
+                .SingleOrDefault(b => b.Id == id);
             if (book is null)
             {
                 return NotFound();
             }
             BookViewModel viewModel = _mapper.Map<BookViewModel>(book);
-           // viewModel.AuthorName = book.Author.Name;
+            // viewModel.AuthorName = book.Author.Name;
             return View(viewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Toggle(int id)
         {
-            Book? book = _context.Books.FirstOrDefault(b=>b.Id==id);
+            Book? book = _context.Books.FirstOrDefault(b => b.Id == id);
             if (book is null) return NotFound();
             book.IsDeleted = !book.IsDeleted;
             book.LastUpdatedOn = DateTime.UtcNow;
-            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            book.LastUpdatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            book.LastUpdatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
             return Ok();
         }
@@ -159,11 +160,11 @@ namespace Bookify.web.Controllers
                 };
                 var result = await _cloudinarySettings.UploadAsync(imageparams);
 
-                book.ImageUrl = result.SecureUrl.ToString() ;
+                book.ImageUrl = result.SecureUrl.ToString();
                 book.ImageThumbnailUrl = GetThumbnailurl(book.ImageUrl);
                 book.ImagePublicId = result.PublicId;
             }
-            book.CreatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            book.CreatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             _context.Books.Add(book);
 
@@ -175,7 +176,7 @@ namespace Bookify.web.Controllers
             //    _context.SaveChanges();
             //}
             // return RedirectToAction("Index");
-            return RedirectToAction(nameof(Details), new { id = book.Id});
+            return RedirectToAction(nameof(Details), new { id = book.Id });
 
         }
         public IActionResult Edit(int id)
@@ -191,11 +192,11 @@ namespace Bookify.web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>  Edit(BookFormViewModel model)
+        public async Task<IActionResult> Edit(BookFormViewModel model)
         {
             Book? book = _context.Books
                 .Include(t => t.categories)
-                .Include(t=>t.copies)
+                .Include(t => t.copies)
                 .FirstOrDefault(p => p.Id == model.Id);
             if (book is null) return NotFound();
 
@@ -240,19 +241,19 @@ namespace Bookify.web.Controllers
 
                 model.ImageUrl = result.SecureUrl.ToString();
 
-                MyImagePublicId=result.PublicId;
+                MyImagePublicId = result.PublicId;
             }
-            else if(model.Image is null && !string.IsNullOrEmpty(book.ImageUrl))
+            else if (model.Image is null && !string.IsNullOrEmpty(book.ImageUrl))
             {
 
-                model.ImageUrl = book.ImageUrl; 
+                model.ImageUrl = book.ImageUrl;
                 model.ImageThumbnailUrl = book.ImageThumbnailUrl;
             }
 
-            book = _mapper.Map(model,book);
+            book = _mapper.Map(model, book);
             book.ImageThumbnailUrl = GetThumbnailurl(book.ImageUrl!);
             book.ImagePublicId = MyImagePublicId;
-            
+
 
             foreach (var category in model.SelectedCategories)
             {
@@ -262,8 +263,8 @@ namespace Bookify.web.Controllers
                 });
                 Debug.WriteLine(category);
             }
-            book.LastUpdatedOn=DateTime.Now;
-            book.LastUpdatedById= User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            book.LastUpdatedOn = DateTime.Now;
+            book.LastUpdatedById = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             if (!model.IsAvailableForRental)
             {
                 foreach (var copy in book.copies)
@@ -280,9 +281,10 @@ namespace Bookify.web.Controllers
             return RedirectToAction(nameof(Details), new { id = book.Id });
 
         }
-        public IActionResult UniqeItem(BookFormViewModel model) {
-            Book? book = _context.Books.FirstOrDefault(b=>b.Title == model.Title && b.AuthorId== model.AuthorId);
-            bool exits = (book is null || book.Id.Equals(model.Id)) ;
+        public IActionResult UniqeItem(BookFormViewModel model)
+        {
+            Book? book = _context.Books.FirstOrDefault(b => b.Title == model.Title && b.AuthorId == model.AuthorId);
+            bool exits = (book is null || book.Id.Equals(model.Id));
             return Json(exits);
         }
         public BookFormViewModel ReturnModels(BookFormViewModel? model = null)
@@ -296,14 +298,36 @@ namespace Bookify.web.Controllers
             return ViewModel;
 
         }
-        private string GetThumbnailurl (string url)
+        private string GetThumbnailurl(string url)
         {
-            
+
 
             string saperator = "/image/upload/";
-            var spliturl= url.Split(saperator);
+            var spliturl = url.Split(saperator);
             string result = $"{spliturl[0]}{saperator}c_thumb,w_200,g_face/{spliturl[1]}";
             return result;
+        }
+        [HttpGet]
+        public IActionResult RentalHistory(int serial)
+        {
+            var Rentals = _context.RentalCopies
+                .Include(c => c.Rental)
+                .ThenInclude(r => r.subscriber)
+                .Where(c => c.CopyBook.SerialNumber == serial)
+                .OrderByDescending(c=>c.RentalDate)
+                .ToList();
+            IEnumerable<BookCopyRentalHistoryViewModel> ViewModel = Rentals.Select(c => new BookCopyRentalHistoryViewModel()
+            {
+                Serial= serial,
+                EndDate = c.EndDate,
+                RentalDate = c.RentalDate,
+                ExtendOn = c.ExtendedOn,
+                ReturnDate = c.ReturnDate,
+                SubName = c.Rental!.subscriber!.FirstName + " " + c.Rental.subscriber.LastName,
+                SubImageUrl = c.Rental.subscriber!.ImageUrl,
+                SubThumbnailImageUrl = c.Rental.subscriber.ThumbnailUrl
+            });
+            return View( ViewModel);
         }
     }
 }

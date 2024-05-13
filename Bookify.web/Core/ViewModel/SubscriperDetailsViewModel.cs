@@ -5,7 +5,7 @@ namespace Bookify.web.Core.ViewModel
 {
     public class SubscriperDetailsViewModel
     {
-        public int Id { get; set; }
+        public string? Key { get; set; }
 
         
         public string fullname { get; set; } 
@@ -37,8 +37,9 @@ namespace Bookify.web.Core.ViewModel
 
         public bool IsDeleted { get; set; }
 
-       
 
+        public IEnumerable<SubscriptionViewModel> Subscriptions { get; set; }=new List<SubscriptionViewModel>();
+        public IEnumerable<RentalViewModel> Rentals { get; set; }=new List<RentalViewModel>();
         public DateTime CreatedOn { get; set; }
 
 

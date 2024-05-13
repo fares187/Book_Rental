@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using Bookify.web.Core.Models;
 using Bookify.web.Core.ViewModel;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bookify.web.Core.Mapping
 {
     public class MappingProfile : Profile
     {
+       
         public MappingProfile()
         {
+   
             // Categories
             CreateMap<Category, CategoryViewModel>();
             CreateMap<Category, SelectListItem>()
@@ -36,7 +39,9 @@ namespace Bookify.web.Core.Mapping
 
 
             CreateMap<BookCopy, BookCopyViewModel>()
-               .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(p=>p.Book!.Title));
+               .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(p=>p.Book!.Title))
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(p=>p.Book!.Id))
+               .ForMember(dest => dest.ThumbnailUrl, opt => opt.MapFrom(p=>p.Book!.ImageThumbnailUrl));
             CreateMap<BookCopyFormViewModel,BookCopy >()
                 .ForMember(dest=>dest.BookId,opt=>opt.Ignore());
 
@@ -63,11 +68,21 @@ namespace Bookify.web.Core.Mapping
                 .ForMember(d => d.ImageThumbnailUrl, opt => opt.MapFrom(d => d.ThumbnailUrl))
                 
                 ;
+            CreateMap<Subscriper, SubscriberSearchViewModel>()
+              .ForMember(d => d.FullName, opt => opt.MapFrom(d => d.FirstName + " " + d.LastName))
+              .ForMember(d => d.thumbnailImageURL, opt => opt.MapFrom(d => d.ThumbnailUrl));
             CreateMap<Subscriper, SubscriperDetailsViewModel>()
                 .ForMember(d => d.fullname, opt => opt.MapFrom(b => $"{b.FirstName} {b.LastName}"))
                 .ForMember(d => d.Area, opt => opt.MapFrom(b => b.Area!.Name))
                 .ForMember(d => d.Governorate, opt => opt.MapFrom(b => b.Governorate!.Name))
                 ;
+
+
+            CreateMap<Subscription, SubscriptionViewModel>();
+
+            //rental
+            CreateMap<Rental,RentalViewModel>();
+            CreateMap<RentalCopy,RentalCopyViewModel>();
         }
     }
 }

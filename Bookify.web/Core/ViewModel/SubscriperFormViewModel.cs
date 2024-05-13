@@ -11,7 +11,7 @@ namespace Bookify.web.Core.ViewModel
 {
 	public class SubscriperFormViewModel
 	{
-		public int Id { get; set; }
+		public string? key { get; set; }
 
 		[MaxLength(100),Required,
 			RegularExpression(RegaxStatic.CharactersOnly_Eng,ErrorMessage =Error.OnlyEnglishLetter)]
@@ -25,17 +25,17 @@ namespace Bookify.web.Core.ViewModel
 		
         [MaxLength(20), Required,
             RegularExpression(RegaxStatic.nationalId,ErrorMessage =Error.nationalIdValidation)]
-        [Remote("UniqeNationalId", null!, AdditionalFields = "Id", ErrorMessage = Error.Dublicated)]
+        [Remote("UniqeNationalId", null!, AdditionalFields = "key", ErrorMessage = Error.Dublicated)]
         public string NationalId { get; set; } = null!;
 		
         [MaxLength(15), Required,
             RegularExpression(RegaxStatic.MobileNumber,ErrorMessage =Error.phoneNumbers)]
-        [Remote("UniqeMobileNumber", null!, AdditionalFields = "Id", ErrorMessage = Error.Dublicated)]
+        [Remote("UniqeMobileNumber", null!, AdditionalFields = "key", ErrorMessage = Error.Dublicated)]
         public string MobileNumber { get; set; } = null!;
 		[Display(Name ="Has WhatsApp?")]
 		public bool HasWhatApp { get; set; }
 		[EmailAddress]
-        [Remote("UniqeEmail", null!, AdditionalFields = "Id", ErrorMessage = Error.Dublicated)]
+        [Remote("UniqeEmail", null!, AdditionalFields = "key", ErrorMessage = Error.Dublicated)]
         public string Email { get; set; } = null!;
 
 
@@ -44,7 +44,7 @@ namespace Bookify.web.Core.ViewModel
 
         public string? ThumbnailUrl { get; set; }
 
-        [RequiredIf("Id == 0",ErrorMessage =Error.image)]
+        [RequiredIf("key == ''", ErrorMessage =Error.image)]
         public IFormFile? Image { get; set; } = null!;
 		
 

@@ -27,7 +27,10 @@ namespace Bookify.web.Data
         public DbSet<BookCategory> BooksCategories { get; set; } 
         public DbSet<Category> Categories { get; set; }   
         public DbSet<Governorate> Governorates { get; set; }   
+        public DbSet<Rental> Rentals { get; set; }   
+        public DbSet<RentalCopy> RentalCopies { get; set; }   
         public DbSet<Subscriper> Subscripers { get; set; }   
+        public DbSet<Subscription> Subscriptions  { get; set; }   
 
         
         protected override void OnModelCreating(ModelBuilder builder)
@@ -41,6 +44,7 @@ namespace Bookify.web.Data
             var cascadefor = builder.Model.GetEntityTypes()
                 .SelectMany(t=>t.GetForeignKeys())
                 .Where(t=>t.DeleteBehavior== DeleteBehavior.Cascade && !t.IsOwnership);
+
             foreach(var fk in cascadefor)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
             builder.Entity<BookCategory>().HasKey(e => new
@@ -48,6 +52,14 @@ namespace Bookify.web.Data
                 e.BookId,
                 e.CategoryId
             });
+            builder.Entity<RentalCopy>().HasKey(e => new
+            {
+                e.RentalId,
+                e.CopyBookId
+            });
+
+            builder.Entity<Rental>().HasQueryFilter(e => !e.IsDeleted);
+            builder.Entity<RentalCopy>().HasQueryFilter(e => !e.Rental!.IsDeleted);
             base.OnModelCreating(builder);
         }
     }

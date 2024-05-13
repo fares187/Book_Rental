@@ -414,6 +414,76 @@ namespace Bookify.web.Migrations
                     b.ToTable("Governorates");
                 });
 
+            modelBuilder.Entity("Bookify.web.Core.Models.Rental", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastUpdatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("PenaltyPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("SubscriberId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("LastUpdatedById");
+
+                    b.HasIndex("SubscriberId");
+
+                    b.ToTable("Rentals");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.RentalCopy", b =>
+                {
+                    b.Property<int>("RentalId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CopyBookId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ExtendedOn")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("RentalDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("RentalId", "CopyBookId");
+
+                    b.HasIndex("CopyBookId");
+
+                    b.ToTable("RentalCopies");
+                });
+
             modelBuilder.Entity("Bookify.web.Core.Models.Subscriper", b =>
                 {
                     b.Property<int>("Id")
@@ -512,6 +582,38 @@ namespace Bookify.web.Migrations
                         .IsUnique();
 
                     b.ToTable("Subscripers");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.Subscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("SubscriberId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("SubscriberId");
+
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -779,6 +881,48 @@ namespace Bookify.web.Migrations
                     b.Navigation("LastUpdatedBy");
                 });
 
+            modelBuilder.Entity("Bookify.web.Core.Models.Rental", b =>
+                {
+                    b.HasOne("Bookify.web.Core.Models.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Bookify.web.Core.Models.ApplicationUser", "LastUpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("LastUpdatedById");
+
+                    b.HasOne("Bookify.web.Core.Models.Subscriper", "subscriber")
+                        .WithMany("Rentals")
+                        .HasForeignKey("SubscriberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("LastUpdatedBy");
+
+                    b.Navigation("subscriber");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.RentalCopy", b =>
+                {
+                    b.HasOne("Bookify.web.Core.Models.BookCopy", "CopyBook")
+                        .WithMany()
+                        .HasForeignKey("CopyBookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Bookify.web.Core.Models.Rental", "Rental")
+                        .WithMany("RentalCopies")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CopyBook");
+
+                    b.Navigation("Rental");
+                });
+
             modelBuilder.Entity("Bookify.web.Core.Models.Subscriper", b =>
                 {
                     b.HasOne("Bookify.web.Core.Models.Area", "Area")
@@ -808,6 +952,23 @@ namespace Bookify.web.Migrations
                     b.Navigation("Governorate");
 
                     b.Navigation("LastUpdatedBy");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.Subscription", b =>
+                {
+                    b.HasOne("Bookify.web.Core.Models.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("Bookify.web.Core.Models.Subscriper", "Subscriber")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("SubscriberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Subscriber");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -871,6 +1032,18 @@ namespace Bookify.web.Migrations
             modelBuilder.Entity("Bookify.web.Core.Models.Governorate", b =>
                 {
                     b.Navigation("Areas");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.Rental", b =>
+                {
+                    b.Navigation("RentalCopies");
+                });
+
+            modelBuilder.Entity("Bookify.web.Core.Models.Subscriper", b =>
+                {
+                    b.Navigation("Rentals");
+
+                    b.Navigation("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

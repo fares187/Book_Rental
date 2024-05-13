@@ -1,0 +1,53 @@
+﻿@model IEnumerable<BookViewModel>
+@{
+    Layout = "_ReportLayout";
+}
+<h1>BooksTable</h1>
+<table class="table" id="customers">
+    <thead>
+        <tr class="fw-bold fs-3 text-gray-800">
+
+            <th>Title</th>
+            <th>Author</th>
+            <th>Categories</th>
+            <th>Publisher</th>
+            <th>Publishing Date</th>
+            <th>Hall</th>
+            <th>Rental status</th>
+            <th>Status</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+
+                <td>@book.Title</td>
+                <td>@book.AuthorName</td>
+                <td>@string.Join(" , ",book.categories)</td>
+                <td>@book.Publisher</td>
+                <td>@book.PublishingDaTe.ToString("dd MMM, yyyy")</td>
+                <td>@book.Hall</td>
+                <td>
+
+
+                    <span class="js-status badge text-bg-@(!book.IsAvailableForRental ? "danger":"success")">@(!book.IsAvailableForRental ? "Disabled" : "Active")</span>
+
+
+                </td>
+                <td>
+
+                    <span class="js-status badge text-bg-@(book.IsDeleted ? "danger":"success")">@(book.IsDeleted ? "Disabled" : "Active")</span>
+
+
+                </td>
+
+            </tr>
+
+        }
+
+
+    </tbody>
+</table>

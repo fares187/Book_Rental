@@ -20,6 +20,9 @@
         @Model.CreatedOn.ToString("dd MMM, yyyy")
     </td>
     <td>
+        <a asp-controller="Books" class="btn btn-primary" asp-action="RentalHistory" asp-route-serial="@Model.SerialNumber">Histroy</a>
+    </td>
+    <td>
         <div class="dropdown">
             <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Action

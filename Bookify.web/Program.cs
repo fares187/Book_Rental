@@ -5,14 +5,21 @@ using Bookify.web.Helpers;
 using Bookify.web.Seeds;
 using Bookify.web.Services;
 using Bookify.web.settings;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Build.Execution;
 using Microsoft.EntityFrameworkCore;
+
 using System.Reflection;
 using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using ViewToHTML.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDataProtection().SetApplicationName(nameof(Bookify));
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsFactory>();
 // Add services to the container.
@@ -24,9 +31,17 @@ options.ValidationInterval = TimeSpan.Zero
 );
 builder.Services.AddTransient<IImageService, ImageService>();   
 builder.Services.AddTransient<IEmailSender, EmailSender>();   
-builder.Services.AddTransient<IEmailBodyBuilder, EmailBodyBuilder>();   
+builder.Services.AddTransient<IEmailBodyBuilder, EmailBodyBuilder>();
+//builder.Services.AddHangfire(x => x.(connectionString));
+//builder.Services.AddHangfireServer();
+// add quartz
+
+
+
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -52,11 +67,21 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 });
 
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
 builder.Services.AddExpressiveAnnotations();
+builder.Services.AddHostedService<QueuedHostedService>();
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+Log.Logger= new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+builder.Host.UseSerilog();
+builder.Services.AddViewToHTML();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,6 +102,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 //var scopefactory= app.Services.GetRequiredService<IServiceScopeFactory>();  
 //using var scope = scopefactory.CreateScope();   
 //var role= scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -88,11 +115,13 @@ app.UseAuthorization();
 
 //await DefaultUser.SeedUsersAcync(user);
 
-
+//app.UseHangfireDashboard("/hangfire");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+///
 
 app.Run();
