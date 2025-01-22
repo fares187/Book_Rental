@@ -1,0 +1,87 @@
+﻿@model IEnumerable<BookCopyRentalHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Rental History";
+
+}
+@if (!Model.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center p-5 mb-10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cone-striped" viewBox="0 0 16 16">
+            <path d="m9.97 4.88.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.158-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098zm4.396 8.613a.5.5 0 0 1 .037.96l-6 2a.5.5 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l2.391-.598.565-2.257c.862.212 1.964.339 3.165.339s2.303-.127 3.165-.339l.565 2.257 2.391.598z"></path>
+        </svg>
+        <div class="d-flex flex-column">
+            <h4 class="mb-1 text-warning">there is no previous rentals for this copy </h4>
+
+        </div>
+
+    </div>
+}
+else
+{
+
+
+    <div class="d-flex flex-wrap">
+        @foreach (var rental in Model)
+        {
+            <div class="card me-5  mb-5" style="width: 18rem;
+              border-color: white;
+             border-style: solid;
+             border-width: 1px;
+             border-radius: 8px;
+             ">
+                <div class="d-flex fs-3  justify-content-center pt-5"> Rented </div>
+                <div class="d-flex fs-5 text-gray-500 mb-3 justify-content-center">by</div>
+
+
+                <div style="height: 160px;width: 160px;overflow: hidden;align-items: center;align-self: center;border-radius: 50%;border-color: white;border-width: 1px;border-style: solid;"
+                     class=" card-img-top justify-content-center d-flex">
+
+                    <img src="@rental.SubThumbnailImageUrl" style="width:100%; height:auto;" class="" alt="@rental.SubName" />
+
+                </div>
+
+
+                <div class="card-body" style="
+                 padding-top: 10px;
+                 ">
+                    <h3 class="card-title text-center mt-0 mb-4"><span class="text-gray-500">@@</span>@rental.SubName</h3>
+                    <hr>
+                    <div class="d-flex" style="justify-content: space-between;">
+                        Rental Date: <span>@rental.RentalDate.ToString("dd MMM, yyyy")</span>
+                    </div>
+
+
+                    <div class="d-flex" style="justify-content: space-between;">
+                        Return Date: <span>@rental.ReturnDate?.ToString("dd MMM, yyyy")</span>
+                    </div>
+
+
+
+                    <div class="d-flex" style="justify-content: space-between;">
+                        End Date: <span>@rental.EndDate.ToString("dd MMM, yyyy")</span>
+                    </div>
+
+
+
+                    <div class="d-flex" style="justify-content: space-between;">
+                        Extend Date: <span>@rental.ExtendOn?.ToString("dd MMM, yyyy")</span>
+                    </div>
+
+
+
+
+                </div>
+
+
+
+
+
+            </div>
+
+        }
+
+
+
+    </div>
+}

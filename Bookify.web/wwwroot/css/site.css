@@ -16,7 +16,76 @@ html {
   position: relative;
   min-height: 100%;
 }
-
+/* start ovrride theme*/
+.form-floating > .form-select {
+    padding-top: 2.15rem;
+    padding-bottom: 0.0rem;
+}
+/* stop overriding theme*/
 body {
   margin-bottom: 60px;
+}
+.form-control.form-control-solid {
+    background-color: #e7ecef;
+    border-color: var(--kt-input-solid-bg);
+    color: var(--kt-input-solid-color);
+    transition: color .2s ease;
+}
+.form-select.form-select-solid {
+    background-color: #e7ecef;
+    border-color: var(--kt-input-solid-bg);
+    color: var(--kt-input-solid-color);
+    transition: color .2s ease;
+}
+/*start costum styles*/
+.dt-spinner + div{
+    display:none !important;
+}
+.h-70px{
+    height:70px !important;
+}
+/*end costum styles*/
+
+.glass {
+    /* From https://css.glass */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.w-fit-content{
+    width:fit-content;
+}
+.custom-header {
+    font-family: 'Satisfy', cursive;
+}
+.page-bg {
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../assats/images/bg9-dark.jpg);
+}
+
+.mh-450px {
+    min-height: 450px;
+}
+
+.launcher .sidebar {
+    position: fixed;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 355px;
+    top: 50px;
+    right: 50px;
+    bottom: 50px;
+    background-color: rgba(19,0,97,.3);
+    border-radius: 1.75rem;
+}
+
+.transform-x {
+    transform: scaleX(-1);
 }

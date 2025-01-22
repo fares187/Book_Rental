@@ -1,0 +1,151 @@
+﻿@model BooksReportViewModel
+@{
+    ViewData["Title"] = "books report";
+}
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-controller="Reports" method="get" id="Filters" class="js-excluded-validataion">
+            <input type="hidden" id="PageNumber" name="pageNumber" value="1" />
+            <div class="row">
+                <div class="col">
+                    <div class=" mb-3">
+                        <select class="form-select form-floating form-select-solid js-select2" data-placeholder="Select an author" placeholder="Select an author"
+                                asp-for="SelectedAuthors" asp-items="@Model.Author">
+                            <option value=""> select Authors</option>
+
+                        </select>
+                        <label asp-for="SelectedAuthors"></label>
+                    </div>
+                    <span asp-validation-for="SelectedAuthors" class="text-danger d-block"></span>
+
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class=" mb-3">
+                        <select class="form-select form-floating form-select-solid js-select2" data-placeholder="Select a Category" placeholder="Select a categories"
+                                asp-for="SelectedCategories" asp-items="@Model.Categories">
+                            <option value=""> Select a Categories</option>
+
+                        </select>
+                        <label asp-for="SelectedCategories"></label>
+
+                    </div>
+                    <span asp-validation-for="SelectedCategories" class="text-danger d-block"></span>
+
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary">Show Report</button>
+        </form>
+    </div>
+</div>
+@if (Model.Data is not null)
+{
+    <div class="card">
+        <div class="card-Header">
+            <div class="card-title">
+                <div class=" fs-2  ps-7 pt-3">Books</div>
+            </div>
+            @if (Model.Data.Any())
+            {
+                <div class="card-toolbar gap-3 d-flex me-12 justify-content-end">
+                    <a class="btn btn-success" asp-action="ExportBooksToExcel"
+                       asp-route-SelectedAuthor="@Context.Request.Query["SelectedAuthors"]"
+                       asp-route-SelectedCategories="@Context.Request.Query["SelectedCategories"]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-spreadsheet-fill" viewBox="0 0 16 16">
+                            <path d="M12 0H4a2 2 0 0 0-2 2v4h12V2a2 2 0 0 0-2-2zm2 7h-4v2h4V7zm0 3h-4v2h4v-2zm0 3h-4v3h2a2 2 0 0 0 2-2v-1zm-5 3v-3H6v3h3zm-4 0v-3H2v1a2 2 0 0 0 2 2h1zm-3-4h3v-2H2v2zm0-3h3V7H2v2zm4 0V7h3v2H6zm0 1h3v2H6v-2z" />
+                        </svg>
+                        Export to excel
+                    </a>
+                    <a class="btn btn-danger" asp-action="ExportBooksToPDF"
+                       asp-route-SelectedAuthor="@Context.Request.Query["SelectedAuthors"]"
+                       asp-route-SelectedCategories="@Context.Request.Query["SelectedCategories"]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf-fill" viewBox="0 0 16 16">
+                            <path d="M5.523 12.424c.14-.082.293-.162.459-.238a7.878 7.878 0 0 1-.45.606c-.28.337-.498.516-.635.572a.266.266 0 0 1-.035.012.282.282 0 0 1-.026-.044c-.056-.11-.054-.216.04-.36.106-.165.319-.354.647-.548zm2.455-1.647c-.119.025-.237.05-.356.078a21.148 21.148 0 0 0 .5-1.05 12.045 12.045 0 0 0 .51.858c-.217.032-.436.07-.654.114zm2.525.939a3.881 3.881 0 0 1-.435-.41c.228.005.434.022.612.054.317.057.466.147.518.209a.095.095 0 0 1 .026.064.436.436 0 0 1-.06.2.307.307 0 0 1-.094.124.107.107 0 0 1-.069.015c-.09-.003-.258-.066-.498-.256zM8.278 6.97c-.04.244-.108.524-.2.829a4.86 4.86 0 0 1-.089-.346c-.076-.353-.087-.63-.046-.822.038-.177.11-.248.196-.283a.517.517 0 0 1 .145-.04c.013.03.028.092.032.198.005.122-.007.277-.038.465z" />
+                            <path fill-rule="evenodd" d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3zM4.165 13.668c.09.18.23.343.438.419.207.075.412.04.58-.03.318-.13.635-.436.926-.786.333-.401.683-.927 1.021-1.51a11.651 11.651 0 0 1 1.997-.406c.3.383.61.713.91.95.28.22.603.403.934.417a.856.856 0 0 0 .51-.138c.155-.101.27-.247.354-.416.09-.181.145-.37.138-.563a.844.844 0 0 0-.2-.518c-.226-.27-.596-.4-.96-.465a5.76 5.76 0 0 0-1.335-.05 10.954 10.954 0 0 1-.98-1.686c.25-.66.437-1.284.52-1.794.036-.218.055-.426.048-.614a1.238 1.238 0 0 0-.127-.538.7.7 0 0 0-.477-.365c-.202-.043-.41 0-.601.077-.377.15-.576.47-.651.823-.073.34-.04.736.046 1.136.088.406.238.848.43 1.295a19.697 19.697 0 0 1-1.062 2.227 7.662 7.662 0 0 0-1.482.645c-.37.22-.699.48-.897.787-.21.326-.275.714-.08 1.103z" />
+                        </svg>
+                        Export to pdf
+                    </a>
+                </div>
+            }
+        </div>
+        <div class="card-Body">
+            @if (Model.Data.TotalPages > 1)
+            {
+                <partial name="_Pagination" model="@(new PaginationViewModel(){
+                    HasNextPage=Model.Data.HasNextPage,
+                    PageNumber=Model.Data.PageIndex,
+                    HasPreviousPage=Model.Data.HasPreviousPage,
+                    TotalPages=Model.Data.TotalPages
+                    })" />
+            }
+            @if (Model.Data.Any())
+            {
+                <div class="table-responsive p-10">
+                    <table class="table">
+                        <thead>
+                            <tr class="fw-bold fs-3 text-gray-800">
+
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Categories</th>
+                                <th>Publisher</th>
+                                <th>Publishing Date</th>
+                                <th>Hall</th>
+                                <th>Rental status</th>
+                                <th>Status</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var book in Model.Data)
+                            {
+                                <tr>
+
+                                    <td>@book.Title</td>
+                                    <td>@book.Author.Name</td>
+                                    <td>@string.Join(" , ",book.categories.Select(c=>c.Category.Name))</td>
+                                    <td>@book.Publisher</td>
+                                    <td>@book.PublishingDaTe.ToString("dd MMM, yyyy")</td>
+                                    <td>@book.Hall</td>
+                                    <td>
+
+
+                                        <span class="js-status badge text-bg-@(!book.IsAvailableForRental ? "danger":"success")">@(!book.IsAvailableForRental ? "Disabled" : "Active")</span>
+
+
+                                    </td>
+                                    <td>
+
+                                        <span class="js-status badge text-bg-@(book.IsDeleted ? "danger":"success")">@(book.IsDeleted ? "Disabled" : "Active")</span>
+
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            }
+            else
+            {
+                <h5>No Books were found</h5>
+            }
+        </div>
+    </div>
+}
+
+
+@section Scripts{
+
+    <script src="~/js/Reports.js"  asp-append-version="true"></script>
+}

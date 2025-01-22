@@ -1,0 +1,44 @@
+﻿@model IEnumerable<DelayedRentalsViewModel>
+@{
+    Layout = "_ReportLayout";
+}
+<h1>Delayed Reports Table</h1>
+<table class="table" id="customers">
+    <thead>
+        <tr class="fw-bold fs-3 text-gray-800">
+
+            <th>Subscriber ID</th>
+            <th>Subscriber Name</th>
+            <th>Subscriber phone</th>
+            <th>Book Title</th>
+            <th>Book Serial</th>
+            <th>Rental Date</th>
+            <th>End Date</th>
+            <th>Extended On</th>
+            <th>Delay in Dayes</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rental in Model)
+        {
+            <tr>
+
+                <td>@rental.SubscriberId</td>
+                <td>@rental.SubscriberName</td>
+                <td>@rental.SubscriberPhone</td>
+                <td>@rental.BookTitle</td>
+                <td>@rental.BookSerial</td>
+                <td>@rental.RentalDate</td>
+                <td>@rental.EndDate</td>
+                <td>@rental.ExtendedOn</td>
+                <td>@rental.DelayInDays</td>
+
+            </tr>
+
+        }
+
+
+    </tbody>
+</table>

@@ -1,0 +1,49 @@
+﻿@model UserViewModel
+<tr>
+    <td>@Model.FullName</td>
+    <td>@Model.UserName</td>
+    <td>@Model.Email</td>
+    <td>@Model.CreatedOn.ToString("dd MMM, yyyy")</td>
+    <td class="js-last">@Model.LastUpdatedOn?.ToString("dd MMM, yyyy")</td>
+    <td>
+        <span class="badge bg-light-@(Model.IsDeleted? "danger": "success")
+        text-@(Model.IsDeleted? "danger": "success")
+         js-status" >
+
+            @(Model.IsDeleted ? "Disabled" : "Active")
+        </span>
+
+    </td>
+    <td>
+
+        <div class="dropdown">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Dropdown link
+            </a>
+
+            <ul class="dropdown-menu" style=" position: absolute; ">
+                <li>
+                    <a class="dropdown-item menu-link flex-stack px-3 js-toggle-status" href="javascript:;"
+                       data-url="/Users/ToggleStatus/@Model.Id">toggle status</a>
+                </li>
+                <li>
+                    <a class="dropdown-item menu-link flex-stack px-3 js-confirm" href="javascript:;"
+                       data-url="/Users/UnLock/@Model.Id" data-massage="Are you sure you want to unlock this user">Unlock User</a>
+                </li>
+                <li>
+                    <a class="dropdown-item menu-link px-3 js-render-modal" href="javascript:;"
+                       data-title="change password" data-url="/Users/Password/@Model.Id"
+                       data-update="true">Change Password</a>
+                </li>
+                <li>
+                    <a class="dropdown-item menu-link px-3 js-render-modal" href="javascript:;"
+                       data-title="Edit User" data-url="/Users/Edit/@Model.Id"
+                       data-update="true">Edit</a>
+                </li>
+              
+            </ul>
+        </div>
+       
+
+    </td>
+</tr>

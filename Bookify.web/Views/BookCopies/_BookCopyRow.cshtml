@@ -1,0 +1,46 @@
+﻿@model BookCopyViewModel
+
+<tr>
+    <td>@Model.SerialNumber</td>
+    <td>@Model.EditionNumber</td>
+    <td>
+        <div class="badge bg-light-@(Model.IsAvailableForRental ? "success" : "danger")  text-@(Model.IsAvailableForRental ? "success" : "danger") ">
+            @(Model.IsAvailableForRental ? "Available" : "Not Avaliable")
+        </div>
+
+
+    </td>
+    <td>
+        <div class="badge bg-light-@(Model.IsDeleted  ? "danger" : "success")  text-@(Model.IsDeleted  ? "danger" : "success") js-status ">
+            @(Model.IsDeleted ? "Disabled" : "Active")
+        </div>
+
+    </td>
+    <td>
+        @Model.CreatedOn.ToString("dd MMM, yyyy")
+    </td>
+    <td>
+        <a asp-controller="Books" class="btn btn-primary" asp-action="RentalHistory" asp-route-serial="@Model.SerialNumber">Histroy</a>
+    </td>
+    <td>
+        <div class="dropdown">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Action
+            </a>
+
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item menu-link flex-stack px-3 js-toggle-status" href="javascript:;"
+                       data-url="/BookCopies/ToggleStatus/@Model.Id">toggle status</a>
+                </li>
+                @*                                            <li><a class="dropdown-item" href="#">toggle rental state</a></li>*@
+                <li>
+                    <a class="dropdown-item menu-link px-3 js-render-modal" href="javascript:;" 
+                       data-title="Edit Copy" data-url="/BookCopies/Edit/@Model.Id"
+                       data-update="true">Edit</a>
+                </li>
+            </ul>
+        </div>
+
+    </td>
+</tr>

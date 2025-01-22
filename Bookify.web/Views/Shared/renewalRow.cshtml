@@ -1,0 +1,17 @@
+﻿@model SubscriptionViewModel
+
+<tr class="odd">
+    <td>
+        @Model.StartDate.ToString("dd ,MMM yyyy")
+    </td>
+    <td>
+        @Model.EndDate.ToString("dd ,MMM yyyy")
+    </td>
+    <td>
+        @Model.CreatedOn.ToString("dd ,MMM yyyy")
+    </td>
+    <td data-order="Invalid date" class="text-end pe-3">
+        <span class="badge badge-light-@(Model.Status.Equals("Expired") ? "danger" : Model.Status.Equals("Not Now") ? "warning": "success")">@Model.Status</span>
+    </td>
+
+</tr>
