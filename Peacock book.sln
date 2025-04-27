@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookify.web", "Bookify.web\Bookify.web.csproj", "{28D33A67-989C-441C-BB73-DA2425C390BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peacock book.web", "Bookify.web\Peacock book.web.csproj", "{28D33A67-989C-441C-BB73-DA2425C390BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
